@@ -68,7 +68,7 @@ module Sorcery
           end
 
           # get the user hash from a provider using information from the params and session.
-          def sorcery_fetch_user_hash(provider_name)
+          def sorcery_fetch_user_hash(provider_name, code)
             # the application should never ask for user hashes from two different providers
             # on the same request.  But if they do, we should be ready: on the second request,
             # clear out the instance variables if the provider is different
@@ -82,7 +82,8 @@ module Sorcery
             # delegate to the provider for the access token and the user hash.
             # cache them in instance variables.
             @access_token ||= @provider.process_callback(params, session) # sends request to oauth agent to get the token
-            @user_hash ||= @provider.get_user_hash(@access_token) # uses the token to send another request to the oauth agent requesting user info
+
+            @user_hash ||= @provider.get_user_hash(@access_token, code) # uses the token to send another request to the oauth agent requesting user info
           end
 
           # for backwards compatibility
@@ -111,8 +112,8 @@ module Sorcery
           end
 
           # tries to login the user from provider's callback
-          def login_from(provider_name, should_remember = false)
-            sorcery_fetch_user_hash provider_name
+          def login_from(provider_name, should_remember = false, code = nil)
+            sorcery_fetch_user_hash provider_name, code
 
             if user = user_class.load_from_provider(provider_name, @user_hash[:uid].to_s)
               # we found the user.
@@ -173,8 +174,8 @@ module Sorcery
           #
           #   create_from(provider) {|user| user.some_check }
           #
-          def create_from(provider_name, &block)
-            sorcery_fetch_user_hash provider_name
+          def create_from(provider_name, code = nil, &block)
+            sorcery_fetch_user_hash provider_name, code
             config = user_class.sorcery_config
 
             attrs = user_attrs(@provider.user_info_mapping, @user_hash)
