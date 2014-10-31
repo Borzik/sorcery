@@ -22,7 +22,7 @@ module Sorcery
         @scope         = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
       end
 
-      def get_user_hash(access_token)
+      def get_user_hash(access_token, code)
         response = access_token.get(user_info_url)
 
         {}.tap do |h|

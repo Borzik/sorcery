@@ -27,7 +27,7 @@ module Sorcery
         @param_name     = 'access_token'
       end
 
-      def get_user_hash(access_token)
+      def get_user_hash(access_token, code)
         response = access_token.get(user_info_path)
 
         {}.tap do |h|

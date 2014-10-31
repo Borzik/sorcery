@@ -30,7 +30,7 @@ module Sorcery
         ::OAuth::Consumer.new(@key, @secret, @configuration)
       end
 
-      def get_user_hash(access_token)
+      def get_user_hash(access_token, code)
         fields = self.user_info_fields.join(',')
         response = access_token.get("#{@user_info_path}:(#{fields})", 'x-li-format' => 'json')
 

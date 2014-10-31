@@ -68,7 +68,7 @@ module Sorcery
           end
 
           # get the user hash from a provider using information from the params and session.
-          def sorcery_fetch_user_hash(provider_name, code)
+          def sorcery_fetch_user_hash(provider_name, code=nil)
             # the application should never ask for user hashes from two different providers
             # on the same request.  But if they do, we should be ready: on the second request,
             # clear out the instance variables if the provider is different
@@ -132,8 +132,8 @@ module Sorcery
           end
 
           # If user is logged, he can add all available providers into his account
-          def add_provider_to_user(provider_name)
-            sorcery_fetch_user_hash provider_name
+          def add_provider_to_user(provider_name, code)
+            sorcery_fetch_user_hash provider_name, code
             config = user_class.sorcery_config
 
             current_user.add_provider_to_user(provider_name.to_s, @user_hash[:uid].to_s)

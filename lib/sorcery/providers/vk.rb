@@ -22,7 +22,7 @@ module Sorcery
         @scope          = 'email'
       end
 
-      def get_user_hash(access_token)
+      def get_user_hash(access_token, code)
         user_hash = {}
 
         params = {

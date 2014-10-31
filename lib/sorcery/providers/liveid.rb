@@ -22,7 +22,7 @@ module Sorcery
         @scope          = 'wl.basic wl.emails wl.offline_access'
       end
 
-      def get_user_hash(access_token)
+      def get_user_hash(access_token, code)
         access_token.token_param = 'access_token'
         response = access_token.get(user_info_url)
 
