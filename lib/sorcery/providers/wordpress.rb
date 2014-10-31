@@ -30,7 +30,7 @@ module Sorcery
       # calculates and returns the url to which the user should be redirected,
       # to get authenticated at the external provider's site.
       def login_url(params, session)
-        authorize_url({ authorize_url: authorize_path })
+        authorize_url({ authorize_url: site + authorize_path })
       end
 
       # tries to login the user from access token
