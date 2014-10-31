@@ -17,6 +17,7 @@ module Sorcery
           require 'sorcery/providers/github'
           require 'sorcery/providers/google'
           require 'sorcery/providers/jira'
+          require 'sorcery/providers/wordpress'
 
           Config.module_eval do
             class << self
