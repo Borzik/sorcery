@@ -132,7 +132,7 @@ module Sorcery
           end
 
           # If user is logged, he can add all available providers into his account
-          def add_provider_to_user(provider_name, code)
+          def add_provider_to_user(provider_name, code=nil)
             sorcery_fetch_user_hash provider_name, code
             config = user_class.sorcery_config
 
