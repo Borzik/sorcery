@@ -13,10 +13,9 @@ module Sorcery
 
 
       def initialize
-        @configuration = {
-            token_url: '/oauth/request_token',
-            access_url: "/oauth/request_access"
-        }
+        @authorize_path = '/oauth/authorize'
+        @token_url = '/oauth/request_token'
+        @access_url = "/oauth/request_access"
       end
 
       def get_user_hash(access_token)
@@ -31,7 +30,7 @@ module Sorcery
       # calculates and returns the url to which the user should be redirected,
       # to get authenticated at the external provider's site.
       def login_url(params, session)
-        authorize_url
+        authorize_url({ authorize_url: authorize_path })
       end
 
       # tries to login the user from access token
