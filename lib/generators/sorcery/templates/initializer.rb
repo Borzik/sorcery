@@ -158,6 +158,13 @@ Rails.application.config.sorcery.configure do |config|
   # config.jira.signature_method =  "RSA-SHA1"
   # config.jira.private_key_file = "rsakey.pem"
 
+  # To use wordpress with sorcery, add a plugin from
+  # https://github.com/justingreerbbi/wordpress-oauth
+  # and configure values:
+  # config.wordpress.site = "http://localhost:8080/"
+  # config.wordpress.key = "wordpress_public_key"
+  # config.wordpress.secret = "wordpress_secret_key"
+  # config.wordpress.callback_url = "http://localhost:3000/oauth/callback?provider=wordpress"
 
   # --- user config ---
   config.user_config do |user|
