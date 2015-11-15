@@ -70,6 +70,11 @@ shared_examples_for "rails_3_core_model" do
       expect(User.sorcery_config.stretches).to eq stretches
     end
 
+    it "enables configuration option 'deliver_later_enabled" do
+      sorcery_model_property_set(:email_delivery_method, :deliver_later)
+      expect(User.sorcery_config.email_delivery_method).to eq :deliver_later
+    end
+
     it 'respond to username=' do
       expect(User.new).to respond_to(:username=)
     end
@@ -87,29 +92,64 @@ shared_examples_for "rails_3_core_model" do
       expect(User).to respond_to :authenticate
     end
 
-    it "authenticate returns true if credentials are good" do
-      username = user.send(User.sorcery_config.username_attribute_names.first)
-
-      expect(User.authenticate username, 'secret').to be_truthy
-    end
-
-    it "authenticate returns nil if credentials are bad" do
-      username = user.send(User.sorcery_config.username_attribute_names.first)
-
-      expect(User.authenticate username, 'wrong!').to be nil
-    end
-
-    context "with empty credentials" do
-      before do
-        sorcery_model_property_set(:downcase_username_before_authenticating, true)
+    describe "#authenticate" do
+      it "returns user if credentials are good" do
+        expect(User.authenticate user.email, 'secret').to eq user
       end
 
-      after do
-        sorcery_reload!
+      it "returns nil if credentials are bad" do
+        expect(User.authenticate user.email, 'wrong!').to be nil
       end
 
-      it "don't downcase empty credentials" do
-        expect(User.authenticate(nil, 'wrong!')).to be_falsy
+      context "downcasing username" do
+        after do
+          sorcery_reload!
+        end
+
+        context "when downcasing set to false" do
+          before do
+            sorcery_model_property_set(:downcase_username_before_authenticating, false)
+          end
+
+          it "does not find user with wrongly capitalized username" do
+            expect(User.authenticate(user.email.capitalize, 'secret')).to be_nil
+          end
+
+          it "finds user with correctly capitalized username" do
+            expect(User.authenticate(user.email, 'secret')).to eq user
+          end
+
+        end
+
+        context "when downcasing set to true" do
+          before do
+            sorcery_model_property_set(:downcase_username_before_authenticating, true)
+          end
+
+          it "does not find user with wrongly capitalized username" do
+            expect(User.authenticate(user.email.capitalize, 'secret')).to eq user
+          end
+
+          it "finds user with correctly capitalized username" do
+            expect(User.authenticate(user.email, 'secret')).to eq user
+          end
+
+        end
+      end
+
+      context "and model implements active_for_authentication?" do
+
+        it "authenticates returns user if active_for_authentication? returns true" do
+          allow_any_instance_of(User).to receive(:active_for_authentication?) { true }
+
+          expect(User.authenticate user.email, 'secret').to eq user
+        end
+
+        it "authenticate returns nil if active_for_authentication? returns false" do
+          allow_any_instance_of(User).to receive(:active_for_authentication?) { false }
+
+          expect(User.authenticate user.email, 'secret').to be_nil
+        end
       end
     end
 
@@ -213,6 +253,63 @@ shared_examples_for "rails_3_core_model" do
         user.save
 
         expect(user.password_confirmation).not_to be_nil
+      end
+    end
+  end
+
+  describe "password validation" do
+
+    let(:user_with_pass) { create_new_user({:username => 'foo_bar', :email => "foo@bar.com", :password => 'foobar'})}
+
+    specify { expect(user_with_pass).to respond_to :valid_password? }
+    
+    it "returns true if password is correct" do
+      expect(user_with_pass.valid_password?("foobar")).to be true
+    end
+  
+    it "returns false if password is incorrect" do
+      expect(user_with_pass.valid_password?("foobug")).to be false
+    end
+  end
+
+  describe "generic send email" do
+    before(:all) do
+      ActiveRecord::Migrator.migrate("#{Rails.root}/db/migrate/activation")
+      User.reset_column_information
+    end
+
+    after(:all) do
+      ActiveRecord::Migrator.rollback("#{Rails.root}/db/migrate/activation")
+    end
+
+    before do
+      @mail = double('mail')
+      allow(::SorceryMailer).to receive(:activation_success_email).and_return(@mail)
+    end
+
+    it "use deliver_later" do
+      sorcery_reload!([:user_activation, :user_activation_mailer, :activation_needed_email_method_name, :email_delivery_method],
+      user_activation_mailer: SorceryMailer ,activation_needed_email_method_name: nil, email_delivery_method: :deliver_later)
+
+      expect(@mail).to receive(:deliver_later).once
+      user.activate!
+    end
+
+    describe 'email_delivery_method is default' do
+      it "use deliver_now if rails version 4.2+" do
+        allow(Rails).to receive(:version).and_return('4.2.0')
+        sorcery_reload!([:user_activation, :user_activation_mailer, :activation_needed_email_method_name],
+        user_activation_mailer: SorceryMailer ,activation_needed_email_method_name: nil)
+        expect(@mail).to receive(:deliver_now).once
+        user.activate!
+      end
+
+      it "use deliver if rails version < 4.2" do
+        allow(Rails).to receive(:version).and_return('4.1.0')
+        sorcery_reload!([:user_activation, :user_activation_mailer, :activation_needed_email_method_name],
+        user_activation_mailer: SorceryMailer ,activation_needed_email_method_name: nil)
+        expect(@mail).to receive(:deliver).once
+        user.activate!
       end
     end
   end

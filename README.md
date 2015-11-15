@@ -3,6 +3,8 @@
 [![Inline docs](http://inch-ci.org/github/NoamB/sorcery.png?branch=master)](http://inch-ci.org/github/NoamB/sorcery)
 
 # sorcery
+
+[![Join the chat at https://gitter.im/NoamB/sorcery](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/NoamB/sorcery?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Magical Authentication for Rails 3 and 4. Supports ActiveRecord,
 DataMapper, Mongoid and MongoMapper.
 
@@ -10,10 +12,11 @@ Inspired by restful_authentication, Authlogic and Devise. Crypto code taken
 almost unchanged from Authlogic. OAuth code inspired by OmniAuth and Ryan
 Bates's railscasts about it.
 
-**What's happening now?** We are rewriting Sorcery with decoupled DB adapters and using modern Rails 4 patterns. The next release (1.0) will be containing some API-breaking changes. Development is going right in the `master` branch.
-We'll continue releasing `0.8.x` branch with security and bug fixes until November 2014.
+**What's happening now?** We are working on 1.0 version, which will include some API-breaking changes. It should be released about April 2015.
+Until then we'll continue releasing `0.9.x` version with bug fixes.
 
-**Rails 4 status:** [Sorcery 0.8.6](http://rubygems.org/gems/sorcery/versions/0.8.6) is fully tested and ready for Rails 4.0 and 4.1.
+**Rails 4 status:** [Sorcery 0.9.0](http://rubygems.org/gems/sorcery/versions/0.9.0) is fully tested and ready for Rails 4.0, 4.1 and 4.2.
+**Mongoid status:** Version 0.9.0 works with Mongoid 4.
 
 https://github.com/NoamB/sorcery/wiki/Simple-Password-Authentication
 
@@ -36,9 +39,8 @@ can write your own authentication flow. It was built with a few goals in mind:
 Hopefully, I've achieved this. If not, let me know.
 
 ## Useful Links
-
-[Documentation](http://rubydoc.info/gems/sorcery) | 
-[Railscast](http://railscasts.com/episodes/283-authentication-with-sorcery) | [Simple tutorial](https://github.com/NoamB/sorcery/wiki/Simple-Password-Authentication) | [Example Rails 3 app](https://github.com/NoamB/sorcery-example-app)
+[Documentation](http://rubydoc.info/gems/sorcery) |
+[Railscast](http://railscasts.com/episodes/283-authentication-with-sorcery) | [Simple tutorial](https://github.com/NoamB/sorcery/wiki/Simple-Password-Authentication) | [Example Rails 4 app](https://github.com/NoamB/sorcery-example-app)
 
 Check out the tutorials in the [Wiki](https://github.com/NoamB/sorcery/wiki) for more!
 
@@ -58,6 +60,8 @@ logged_in?      # available to view
 current_user    # available to view
 redirect_back_or_to # used when a user tries to access a page while logged out, is asked to login, and we want to return him back to the page he originally wanted.
 @user.external? # external users, such as facebook/twitter etc.
+@user.active_for_authentication? # add this method to define behaviour that will prevent selected users from signing in
+@user.valid_password?('secret') # compares 'secret' with the actual @user's password, returns true if they match
 User.authenticates_with_sorcery!
 ```
 
@@ -78,6 +82,7 @@ create_from(provider) # create the user in the local app db.
 auto_login(user, should_remember=false)  # login without credentials, optional remember_me
 remember_me!
 forget_me!
+force_forget_me!    # completely forgets all sessions by clearing the token, even if remember_me_token_persist_globally is true
 ```
 
 ### reset password
@@ -212,6 +217,7 @@ STI is supported via a single setting in config/initializers/sorcery.rb.
 
 *   Remember me with configurable expiration.
 *   configurable attribute names.
+*   configurable to persist globally (supporting multiple browsers at the same time), or starting anew after each login
 
 
 **Session Timeout** (see [lib/sorcery/controller/submodules/session_timeout.rb](https://github.com/NoamB/sorcery/blob/master/lib/sorcery/controller/submodules/session_timeout.rb)):
@@ -237,15 +243,14 @@ STI is supported via a single setting in config/initializers/sorcery.rb.
 
 *   automatic logging of last login, last logout, last activity time and IP
     address for last login.
-*   an easy method of collecting the list of currently logged in users.
 *   configurable timeout by which to decide whether to include a user in the
     list of logged in users.
 
 
 **External** (see [lib/sorcery/controller/submodules/external.rb](https://github.com/NoamB/sorcery/blob/master/lib/sorcery/controller/submodules/external.rb)):
 
-*   OAuth1 and OAuth2 support (currently: Twitter, Facebook, Github, Google,
-    LinkedIn, VK, LiveID and Xing)
+*   OAuth1 and OAuth2 support (currently: Twitter, Facebook, Github, Google, Heroku,
+    LinkedIn, VK, LiveID, Xing, and Salesforce)
 *   configurable db field names and authentications table.
 
 
@@ -293,6 +298,15 @@ attributes such as password and password_confirmation)
 ## Upgrading
 
 Important notes while upgrading:
+
+*   If you are upgrading from <= **1.0.0**
+
+    *  `before_logout` does not take arguments anymore (`current_user` still returns user at this point)
+    *  `after_logout` takes one argument (`user`) as `current_user` returns `nil` then
+
+*   If you are upgrading from <= **0.8.6** and you use Sorcery model methods in your app,
+    you might need to change them from `user.method` to `user.sorcery_adapter.method` and from
+    `User.method` to `User.sorcery_adapter_method`
 
 *   If you are upgrading from <= **0.8.5** and you're using Sorcery test helpers,
     you need to change the way you include them to following code:
@@ -353,6 +367,12 @@ twitter: @nbenari
 email: shatrov@me.com
 
 twitter: @Kiiiir
+
+#### Grzegorz Witek
+
+email: arnvald.to@gmail.com
+
+twitter: @arnvald
 
 ## Copyright
 

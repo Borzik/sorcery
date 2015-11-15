@@ -4,7 +4,7 @@ class SorceryController < ActionController::Base
   protect_from_forgery
 
   before_filter :require_login_from_http_basic, only: [:test_http_basic_auth]
-  before_filter :require_login, only: [:test_logout, :test_should_be_logged_in, :some_action]
+  before_filter :require_login, only: [:test_logout, :test_logout_with_force_forget_me, :test_should_be_logged_in, :some_action]
 
   def index
   end
@@ -42,6 +42,13 @@ class SorceryController < ActionController::Base
 
   def test_logout_with_remember
     remember_me!
+    logout
+    render nothing: true
+  end
+
+  def test_logout_with_force_forget_me
+    remember_me!
+    force_forget_me!
     logout
     render nothing: true
   end
@@ -106,6 +113,10 @@ class SorceryController < ActionController::Base
     login_at(:vk)
   end
 
+  def login_at_test_salesforce
+    login_at(:salesforce)
+  end
+
   def login_at_test_with_state
     login_at(:facebook, {state: 'bla'})
   end
@@ -168,6 +179,14 @@ class SorceryController < ActionController::Base
     end
   end
 
+  def test_login_from_salesforce
+    if @user = login_from(:salesforce)
+      redirect_to 'bla', notice: 'Success!'
+    else
+      redirect_to 'blu', alert: 'Failed!'
+    end
+  end
+
   def test_return_to_with_external_twitter
     if @user = login_from(:twitter)
       redirect_back_or_to 'bla', notice: 'Success!'
@@ -220,6 +239,14 @@ class SorceryController < ActionController::Base
 
   def test_return_to_with_external_vk
     if @user = login_from(:vk)
+      redirect_back_or_to 'bla', notice: 'Success!'
+    else
+      redirect_to 'blu', alert: 'Failed!'
+    end
+  end
+
+  def test_return_to_with_external_salesforce
+    if @user = login_from(:salesforce)
       redirect_back_or_to 'bla', notice: 'Success!'
     else
       redirect_to 'blu', alert: 'Failed!'

@@ -15,9 +15,11 @@ module Sorcery
           require 'sorcery/providers/liveid'
           require 'sorcery/providers/xing'
           require 'sorcery/providers/github'
+          require 'sorcery/providers/heroku'
           require 'sorcery/providers/google'
           require 'sorcery/providers/jira'
           require 'sorcery/providers/wordpress'
+          require 'sorcery/providers/salesforce'
 
           Config.module_eval do
             class << self
@@ -60,7 +62,7 @@ module Sorcery
             @provider = sorcery_get_provider provider_name
             sorcery_fixup_callback_url @provider
             if @provider.respond_to?(:login_url) && @provider.has_callback?
-              @provider.state = args[:state] if args[:state]
+              @provider.state = args[:state]
               return @provider.login_url(params, session)
             else
               return nil

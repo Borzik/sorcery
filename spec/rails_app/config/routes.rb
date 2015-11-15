@@ -11,6 +11,7 @@ AppRoot::Application.routes.draw do
     get :test_login_from_cookie
     get :test_login_from
     get :test_logout_with_remember
+    get :test_logout_with_force_forget_me
     get :test_should_be_logged_in
     get :test_create_from_provider
     get :test_add_second_provider
@@ -23,6 +24,7 @@ AppRoot::Application.routes.draw do
     get :test_login_from_liveid
     get :test_login_from_vk
     get :test_login_from_jira
+    get :test_login_from_salesforce
     get :login_at_test
     get :login_at_test_twitter
     get :login_at_test_facebook
@@ -31,6 +33,7 @@ AppRoot::Application.routes.draw do
     get :login_at_test_liveid
     get :login_at_test_vk
     get :login_at_test_jira
+    get :login_at_test_salesforce
     get :test_return_to_with_external
     get :test_return_to_with_external_twitter
     get :test_return_to_with_external_facebook
@@ -39,6 +42,7 @@ AppRoot::Application.routes.draw do
     get :test_return_to_with_external_liveid
     get :test_return_to_with_external_vk
     get :test_return_to_with_external_jira
+    get :test_return_to_with_external_salesforce
     get :test_http_basic_auth
     get :some_action_making_a_non_persisted_change_to_the_user
     post :test_login_with_remember

@@ -73,7 +73,7 @@ Rails.application.config.sorcery.configure do |config|
 
 
   # -- external --
-  # What providers are supported by this app, i.e. [:twitter, :facebook, :github, :linkedin, :xing, :google, :liveid] .
+  # What providers are supported by this app, i.e. [:twitter, :facebook, :github, :linkedin, :xing, :google, :liveid, :salesforce] .
   # Default: `[]`
   #
   # config.external_providers =
@@ -107,7 +107,7 @@ Rails.application.config.sorcery.configure do |config|
   # config.xing.user_info_mapping = {first_name: "first_name", last_name: "last_name"}
   #
   #
-  # Twitter wil not accept any requests nor redirect uri containing localhost,
+  # Twitter will not accept any requests nor redirect uri containing localhost,
   # make sure you use 0.0.0.0:3000 to access your app in development
   #
   # config.twitter.key = ""
@@ -119,8 +119,9 @@ Rails.application.config.sorcery.configure do |config|
   # config.facebook.secret = ""
   # config.facebook.callback_url = "http://0.0.0.0:3000/oauth/callback?provider=facebook"
   # config.facebook.user_info_mapping = {:email => "name"}
-  # config.facebook.access_permissions = ["email", "publish_stream"]
+  # config.facebook.access_permissions = ["email", "publish_actions"]
   # config.facebook.display = "page"
+  # config.facebook.api_version = "v2.2"
   #
   # config.github.key = ""
   # config.github.secret = ""
@@ -131,6 +132,7 @@ Rails.application.config.sorcery.configure do |config|
   # config.google.secret = ""
   # config.google.callback_url = "http://0.0.0.0:3000/oauth/callback?provider=google"
   # config.google.user_info_mapping = {:email => "email", :username => "name"}
+  # config.google.scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
   #
   # config.vk.key = ""
   # config.vk.secret = ""
@@ -165,6 +167,18 @@ Rails.application.config.sorcery.configure do |config|
   # config.wordpress.key = "wordpress_public_key"
   # config.wordpress.secret = "wordpress_secret_key"
   # config.wordpress.callback_url = "http://localhost:3000/oauth/callback?provider=wordpress"
+
+  # For information about Salesforce API:
+  # https://developer.salesforce.com/signup &
+  # https://www.salesforce.com/us/developer/docs/api_rest/
+  # Salesforce callback_url must be https. You can run the following to generate self-signed ssl cert
+  # openssl req -new -newkey rsa:2048 -sha1 -days 365 -nodes -x509 -keyout server.key -out server.crt
+  # Make sure you have configured the application link properly
+  # config.salesforce.key = '123123'
+  # config.salesforce.secret = 'acb123'
+  # config.salesforce.callback_url = "https://127.0.0.1:9292/oauth/callback?provider=salesforce"
+  # config.salesforce.scope = "full"
+  # config.salesforce.user_info_mapping = {:email => "email"}
 
   # --- user config ---
   config.user_config do |user|
@@ -249,6 +263,13 @@ Rails.application.config.sorcery.configure do |config|
     # user.remember_me_for =
 
 
+    # when true sorcery will persist a single remember me token for all
+    # logins/logouts (supporting remembering on multiple browsers simultaneously).
+    # Default: false
+    #
+    # user.remember_me_token_persist_globally =
+
+
     # -- user_activation --
     # the attribute name to hold activation state (active/pending).
     # Default: `:activation_state`
@@ -286,6 +307,12 @@ Rails.application.config.sorcery.configure do |config|
     # Default: `false`
     #
     # user.activation_mailer_disabled =
+
+    # method to send email related
+    # options: `:deliver_later`, `:deliver_now`, `:deliver`
+    # Default: :deliver (Rails version < 4.2) or :deliver_now (Rails version 4.2+)
+    #
+    # user.email_delivery_method =
 
 
     # activation needed email method on your mailer class.

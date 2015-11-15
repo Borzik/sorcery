@@ -3,17 +3,35 @@
 ## 1.0 (not released yet)
 
 * Adapters (Mongoid, MongoMapper, DataMapper) are now separated from the core Sorcery repo and moved under `sorcery-rails` organization. Special thanks to @juike!
+* `current_users` method was removed
+* Added `logged_in?` `logged_out?` `online?` to activity_logging instance methods
 
-## 0.8.7 (not released yet)
+## 0.9.1
 
+* Fixed fetching private emails from github (thanks to @saratovsource)
+* Added support for `active_for_authentication?` method (thanks to @gchaincl)
+* Fixed migration bug for `external` submodule (thanks to @skv-headless)
+* Added support for new Facebook Graph API (thanks to @mchaisse)
+* Fixed issue with Xing submodule (thanks to @yoyostile)
+* Fixed security bug with using `state` field in oAuth requests
+
+## 0.9.0
+
+* Sending emails works with Rails 4.2 (thanks to @wooly)
+* Added `valid_password?` method
+* Added support for JIRA OAuth (thanks to @camilasan)
+* Added support for Heroku OAuth (thanks to @tyrauber)
+* Added support for Salesforce OAuth (thanks to @supremebeing7)
+* Added support for Mongoid 4
+* Fixed issues with empty passwords (thanks to @Borzik)
 * `find_by_provider_and_uid` method was replaced with `find_by_oauth_credentials`
 * Sorcery::VERSION constant was added to allow easy version check
-* `@user.setup_activation` method was made to be public
+* `@user.setup_activation` method was made to be public (thanks @iTakeshi)
 * `current_users` method is deprecated
 * Fetching email from VK auth, thanks to @makaroni4
-* Add logged_in? method to test_helpers
-* #locked? method is now public API
-* Introduces a new User instance method `generate_reset_password_token` to generate a new reset password token without sending an email
+* Add logged_in? method to test_helpers (thanks to @oriolbcn)
+* #locked? method is now public API (thanks @rogercampos)
+* Introduces a new User instance method `generate_reset_password_token` to generate a new reset password token without sending an email (thanks to @tbuehl)
 
 ## 0.8.6
 
